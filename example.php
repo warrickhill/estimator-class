@@ -2,36 +2,31 @@
 include_once 'estimate.class.php';
 
 // example array. we will be using the unix time stamp as the base for calculating Reading 1 and 2.
-$array = Array
-(
-    [0] => Array
-        (
-            [Date] => 1346630400
-            [Reading_1] => 10422
-            [Reading_2] => 9456
-        )
-
-    [1] => Array
-        (
-            [Date] => 1350864000
-            [Reading_1] => 10651
-            [Reading_2] => 9551
-        )
-
-    [2] => Array
-        (
-            [Date] => 1351382400
-            [Reading_1] => 10701
-            [Reading_2] => 9564
-        )
-
-    [3] => Array
-        (
-            [Date] => 1366070400
-            [Reading_1] => 13205
-            [Reading_2] => 10336
-        )
-
+$array = array (
+  0 =>
+  array (
+    'Date' => '1346630400',
+    'Reading_1' => '10422',
+    'Reading_2' => '9456',
+  ),
+  1 =>
+  array (
+    'Date' => '1350864000',
+    'Reading_1' => '10651',
+    'Reading_2' => '9551',
+  ),
+  2 =>
+  array (
+    'Date' => '1351382400',
+    'Reading_1' => '10701',
+    'Reading_2' => '9564',
+  ),
+  3 =>
+  array (
+    'Date' => '1366070400',
+    'Reading_1' => '13205',
+    'Reading_2' => '10336',
+  ),
 );
 
 // create new object. the array and the key which we will use to calculate the estimates must be passed
