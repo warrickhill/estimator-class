@@ -1,14 +1,10 @@
 <?php
-
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of estimate
+ * Estimate is a php class designed to estimate meter readings, for water or eletric consumption mainly, but other applications could be found.
  *
- * @author diddle
+ * Uses an inputed array to calculate the estimates.
+ *
+ * @author Warrick Hill - http://www.elephantpc.com
  */
 class estimate {
 
