@@ -108,7 +108,43 @@ class estimate {
         return $n;
     }
 
+    function average($key, $value, $point) {
+        // first get closest high and low
+        $high_si = $this->get_high($this->sorted_input, $key, $point);
+        $high_eo = $this->get_high($this->estmated_output, $key, $point);
+        if ($high_eo >= $high_si) {
+            $high = $high_si;
+        } else {
+            $high = $high_eo;
+        }
+
+        $low_si = $this->get_low($this->sorted_input, $key, $point);
+        $low_eo = $this->get_low($this->estmated_output, $key, $point);
+        if ($low_eo >= $low_si) {
+            $low = $low_si;
+        } else {
+            $low = $low_eo;
+        }
+
+        // get differance in key
+
+        $key_diff = $high[$key] - $low[$key];
+
+        // get differance in value
+        $value_diff = $high[$value] - $low[$value];
+
+        // work out average
+        // check if zero first
+        if ($key_diff == 0) {
+            $key_diff = 1;
+        }
+
+        $average = $value_diff / $key_diff;
+        return $average;
+    }
+
     function estimate($key, $point, $value) {
+
         // first get closest high and low
         $high_si = $this->get_high($this->sorted_input, $key, $point);
         $high_eo = $this->get_high($this->estmated_output, $key, $point);
@@ -142,27 +178,21 @@ class estimate {
             $estimate = $low[$value] - ( ($low[$key] - $point) * $average);
         } else {
 
-            // get differance in key
-
-            $key_diff = $high[$key] - $low[$key];
-
-            // get differance in value
-            $value_diff = $high[$value] - $low[$value];
-
-            // work out average
-            // check if zero first
-            if ($key_diff == 0) {
-                $key_diff = 1;
-            }
-
-            $average = $value_diff / $key_diff;
-
-            // work out estimate
+            $average = $this->average($key, $value, $point);
 
             $estimate = (($point - $low[$key]) * $average) + $low[$value];
         }
 
-        return round($estimate, 1);
+        return $estimate;
+    }
+
+    function series_estimate($key, $point, $value, $series) {
+        for($i = 3; $i > 0; $i--) {
+            $values[] = $this->estimate($key, $point, $value);
+            $point = $point - $series;
+        }
+        $average = array_sum($values) / count($values);
+        return $average;
     }
 
 }

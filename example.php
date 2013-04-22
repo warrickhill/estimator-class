@@ -51,7 +51,8 @@ $ele_est = new estimate($array, 'Date');
                     ['Date', 'Reading 1', 'Reading 2', 'Total']
 <?php
 $unix = 1354838400;
-$t = time();
+//$t = time();
+$t = $unix + 31536000;
 $lowest['ele'][1] = $ele_est->estimate('Date', $unix, 'Reading_1');
 $lowest['ele'][2] = $ele_est->estimate('Date', $unix, 'Reading_2');
 while ($unix < $t) {
@@ -63,10 +64,41 @@ echo ",['" . date("d.m.y", $t) . "', " . ($ele_est->estimate('Date', $t, 'Readin
             ]);
 
             var options = {
-                title: 'Water Usage'
+                title: 'Usage'
             };
 
             var chart = new google.visualization.LineChart(document.getElementById('ele_chart_div'));
+            chart.draw(data, options);
+        }
+        </script>
+        <div id="ele2_chart_div" style="width: 100%;"></div>
+
+        <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+        <script type="text/javascript">
+            google.load("visualization", "1", {packages:["corechart"]});
+            google.setOnLoadCallback(drawChart);
+            function drawChart() {
+                var data = google.visualization.arrayToDataTable([
+                    ['Date', 'Reading 1', 'Reading 2', 'Total']
+<?php
+$unix = 1354838400;
+//$t = time();
+$t = $unix + 31536000;
+$lowest['ele'][1] = $ele_est->series_estimate('Date', $unix, 'Reading_1', 31536000);
+$lowest['ele'][2] = $ele_est->series_estimate('Date', $unix, 'Reading_2', 31536000);
+while ($unix < $t) {
+    echo ",['" . date("d.m.y", $unix) . "', " . ($ele_est->series_estimate('Date', $unix, 'Reading_1', 31536000) - $lowest['ele'][1]) . ", " . ($ele_est->series_estimate('Date', $unix, 'Reading_2', 31536000) - $lowest['ele'][2]) . ", " . (($ele_est->series_estimate('Date', $unix, 'Reading_1', 31536000) - $lowest['ele'][1]) + ($ele_est->series_estimate('Date', $unix, 'Reading_2', 31536000) - $lowest['ele'][2])) . "]\n";
+    $unix = $unix + (60 * 60 * 24 * 7 * 4.3);
+}
+echo ",['" . date("d.m.y", $t) . "', " . ($ele_est->series_estimate('Date', $t, 'Reading_1', 31536000) - $lowest['ele'][1]) . ", " . ($ele_est->series_estimate('Date', $t, 'Reading_2', 31536000) - $lowest['ele'][2]) . ", " . (($ele_est->series_estimate('Date', $t, 'Reading_1', 31536000) - $lowest['ele'][1]) + ($ele_est->series_estimate('Date', $t, 'Reading_2', 31536000) - $lowest['ele'][2])) . "]\n";
+?>
+            ]);
+
+            var options = {
+                title: 'Usage'
+            };
+
+            var chart = new google.visualization.LineChart(document.getElementById('ele2_chart_div'));
             chart.draw(data, options);
         }
         </script>
