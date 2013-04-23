@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Estimate is a php class designed to estimate meter readings, for water or eletric consumption mainly, but other applications could be found.
  *
@@ -47,21 +48,9 @@ class estimate {
 
     function overall_average($key, $value) {
         // first get high and low
-        $high_si = $this->get_highest($this->sorted_input, $key);
-        $high_eo = $this->get_highest($this->estmated_output, $key);
-        if ($high_eo >= $high_si) {
-            $high = $high_si;
-        } else {
-            $high = $high_eo;
-        }
+        $high = $this->get_highest($this->sorted_input, $key);
 
-        $low_si = $this->get_lowest($this->sorted_input, $key);
-        $low_eo = $this->get_lowest($this->estmated_output, $key);
-        if ($low_eo >= $low_si) {
-            $low = $low_si;
-        } else {
-            $low = $low_eo;
-        }
+        $low = $this->get_lowest($this->sorted_input, $key);
 
         // get differance in key
 
@@ -106,21 +95,9 @@ class estimate {
 
     function average($key, $value, $point) {
         // first get closest high and low
-        $high_si = $this->get_high($this->sorted_input, $key, $point);
-        $high_eo = $this->get_high($this->estmated_output, $key, $point);
-        if ($high_eo >= $high_si) {
-            $high = $high_si;
-        } else {
-            $high = $high_eo;
-        }
+        $high = $this->get_high($this->sorted_input, $key, $point);
 
-        $low_si = $this->get_low($this->sorted_input, $key, $point);
-        $low_eo = $this->get_low($this->estmated_output, $key, $point);
-        if ($low_eo >= $low_si) {
-            $low = $low_si;
-        } else {
-            $low = $low_eo;
-        }
+        $low = $this->get_low($this->sorted_input, $key, $point);
 
         // get differance in key
 
@@ -139,37 +116,33 @@ class estimate {
         return $average;
     }
 
+    function insert_est_array($key, $point, $value, $estimate) {
+        foreach ($this->estmated_output as $row => $out) {
+            if ($out[$key] == $point) {
+                if (!array_key_exists($value, $out)) {
+                    $this->estmated_output[$row][$value] = $estimate;
+                }
+                return;
+            }
+        }
+        $this->estmated_output[] = array(
+            $key => $point,
+            $value => $estimate
+        );
+    }
+
     function estimate($key, $point, $value) {
-
-        // first get closest high and low
-        $high_si = $this->get_high($this->sorted_input, $key, $point);
-        $high_eo = $this->get_high($this->estmated_output, $key, $point);
-        if ($high_eo >= $high_si) {
-            $high = $high_si;
-        } else {
-            $high = $high_eo;
-        }
-
-        $low_si = $this->get_low($this->sorted_input, $key, $point);
-        $low_eo = $this->get_low($this->estmated_output, $key, $point);
-        if ($low_eo >= $low_si) {
-            $low = $low_si;
-        } else {
-            $low = $low_eo;
-        }
+        $high = $this->get_high($this->sorted_input, $key, $point);
+        $low = $this->get_low($this->sorted_input, $key, $point);
 
         if ($point > $high[$key]) {
 
             $average = $this->overall_average($key, $value);
 
-            // work out estimate
-
             $estimate = (($point - $high[$key]) * $average) + $high[$value];
         } elseif ($point < $low[$key]) {
 
             $average = $this->overall_average($key, $value);
-
-            // work out estimate
 
             $estimate = $low[$value] - ( ($low[$key] - $point) * $average);
         } else {
@@ -179,11 +152,12 @@ class estimate {
             $estimate = (($point - $low[$key]) * $average) + $low[$value];
         }
 
+        $this->insert_est_array($key, $point, $value, $estimate);
         return $estimate;
     }
 
     function series_estimate($key, $point, $value, $series) {
-        for($i = 3; $i > 0; $i--) {
+        for ($i = 3; $i > 0; $i--) {
             $values[] = $this->estimate($key, $point, $value);
             $point = $point - $series;
         }
