@@ -9,12 +9,15 @@
  */
 class estimate {
 
-    var $sorted_input;
+    private $sorted_input;
+
+    /**
+     * An Array of all the estmiates performed so far.
+     */
     var $estmated_output;
 
     function __construct($array, $key) {
         $this->sorted_input = $this->sort_array($array, $key);
-        $this->estmated_output = $this->sort_array($array, $key);
     }
 
     /**
@@ -29,10 +32,9 @@ class estimate {
         return $array;
     }
 
-    /*
+    /**
      * Returns the highest value of field $key.
      */
-
     function get_highest($array, $key) {
         $n[$key] = -99999999999;
         foreach ($array as $value) {
@@ -43,10 +45,9 @@ class estimate {
         return $n;
     }
 
-    /*
+    /**
      * Returns the lowest value of field $key.
      */
-
     function get_lowest($array, $key) {
         $n[$key] = 99999999999;
         foreach ($array as $value) {
@@ -57,10 +58,9 @@ class estimate {
         return $n;
     }
 
-    /*
+    /**
      * Returns the overall average of $value field per $key field.
      */
-
     function overall_average($key, $value) {
         // first get high and low
         $high = $this->get_highest($this->sorted_input, $key);
@@ -84,10 +84,9 @@ class estimate {
         return $average;
     }
 
-    /*
+    /**
      * Returns the next highest value of field $key after $point.
      */
-
     function get_high($array, $key, $point) {
         $n = $this->get_highest($array, $key);
         foreach ($array as $value) {
@@ -100,10 +99,9 @@ class estimate {
         return $n;
     }
 
-    /*
+    /**
      * Returns the next lowest value of field $key before $point.
      */
-
     function get_low($array, $key, $point) {
         $n = $this->get_lowest($array, $key);
         foreach ($array as $value) {
@@ -116,10 +114,9 @@ class estimate {
         return $n;
     }
 
-    /*
+    /**
      * Returns the average of $value field per $key at $point of $key.
      */
-
     function average($key, $value, $point) {
         // first get closest high and low
         $high = $this->get_high($this->sorted_input, $key, $point);
@@ -143,17 +140,18 @@ class estimate {
         return $average;
     }
 
-    /*
+    /**
      * Populates the estimated_output array each time an estimate is made.
      */
-
     function insert_est_array($key, $point, $value, $estimate) {
-        foreach ($this->estmated_output as $row => $out) {
-            if ($out[$key] == $point) {
-                if (!array_key_exists($value, $out)) {
-                    $this->estmated_output[$row][$value] = $estimate;
+        if (!empty($this->estmated_output)) {
+            foreach ($this->estmated_output as $row => $out) {
+                if ($out[$key] == $point) {
+                    if (!array_key_exists($value, $out)) {
+                        $this->estmated_output[$row][$value] = $estimate;
+                    }
+                    return;
                 }
-                return;
             }
         }
         $this->estmated_output[] = array(
@@ -162,10 +160,9 @@ class estimate {
         );
     }
 
-    /*
+    /**
      * Returns the estmiate of the value of the $value field at $point of the $key field.
      */
-
     function estimate($key, $point, $value) {
         $high = $this->get_high($this->sorted_input, $key, $point);
         $low = $this->get_low($this->sorted_input, $key, $point);
@@ -201,10 +198,9 @@ class estimate {
         return $average;
     }
 
-    /*
+    /**
      * Returns the differance or increase of $value field between $point of $key and ($point - $diff) of $key.
      */
-
     function differance_estimate($key, $point, $value, $diff) {
         $hightvalues = $this->estimate($key, $point, $value);
         $point = $point - $diff;
@@ -213,10 +209,9 @@ class estimate {
         return $usage;
     }
 
-    /*
+    /**
      * Returns the average over the last 3 series of differance_estimate.
      */
-
     function series_diff_estimate($key, $point, $value, $series, $diff) {
         for ($i = 3; $i > 0; $i--) {
             $values[] = $this->differance_estimate($key, $point, $value, $diff);
