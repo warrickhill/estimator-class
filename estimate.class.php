@@ -7,7 +7,8 @@
  *
  * @author Warrick Hill - http://www.elephantpc.com
  */
-class estimate {
+class estimate
+{
 
     private $sorted_input;
 
@@ -16,14 +17,16 @@ class estimate {
      */
     var $estmated_output;
 
-    function __construct($array, $key) {
+    function __construct($array, $key)
+    {
         $this->sorted_input = $this->sort_array($array, $key);
     }
 
     /**
      * Sorts an Array by the $key field ascendingly
      */
-    function sort_array($array, $key) {
+    function sort_array($array, $key)
+    {
         foreach ($array as $temp_list) {
             $sort_aux[] = ($temp_list[$key]);
         }
@@ -35,33 +38,38 @@ class estimate {
     /**
      * Returns the highest value of field $key.
      */
-    function get_highest($array, $key) {
+    function get_highest($array, $key)
+    {
         $n[$key] = -99999999999;
         foreach ($array as $value) {
             if ($value[$key] >= $n[$key]) {
                 $n = $value;
             }
         }
+
         return $n;
     }
 
     /**
      * Returns the lowest value of field $key.
      */
-    function get_lowest($array, $key) {
+    function get_lowest($array, $key)
+    {
         $n[$key] = 99999999999;
         foreach ($array as $value) {
             if ($value[$key] <= $n[$key]) {
                 $n = $value;
             }
         }
+
         return $n;
     }
 
     /**
      * Returns the overall average of $value field per $key field.
      */
-    function overall_average($key, $value) {
+    function overall_average($key, $value)
+    {
         // first get high and low
         $high = $this->get_highest($this->sorted_input, $key);
 
@@ -81,13 +89,15 @@ class estimate {
         }
 
         $average = $value_diff / $key_diff;
+
         return $average;
     }
 
     /**
      * Returns the next highest value of field $key after $point.
      */
-    function get_high($array, $key, $point) {
+    function get_high($array, $key, $point)
+    {
         $n = $this->get_highest($array, $key);
         foreach ($array as $value) {
             if ($value[$key] >= $point) {
@@ -96,13 +106,15 @@ class estimate {
                 }
             }
         }
+
         return $n;
     }
 
     /**
      * Returns the next lowest value of field $key before $point.
      */
-    function get_low($array, $key, $point) {
+    function get_low($array, $key, $point)
+    {
         $n = $this->get_lowest($array, $key);
         foreach ($array as $value) {
             if ($value[$key] <= $point) {
@@ -111,13 +123,15 @@ class estimate {
                 }
             }
         }
+
         return $n;
     }
 
     /**
      * Returns the average of $value field per $key at $point of $key.
      */
-    function average($key, $value, $point) {
+    function average($key, $value, $point)
+    {
         // first get closest high and low
         $high = $this->get_high($this->sorted_input, $key, $point);
 
@@ -137,33 +151,37 @@ class estimate {
         }
 
         $average = $value_diff / $key_diff;
+
         return $average;
     }
 
     /**
      * Populates the estimated_output array each time an estimate is made.
      */
-    function insert_est_array($key, $point, $value, $estimate) {
+    function insert_est_array($key, $point, $value, $estimate)
+    {
         if (!empty($this->estmated_output)) {
             foreach ($this->estmated_output as $row => $out) {
                 if ($out[$key] == $point) {
                     if (!array_key_exists($value, $out)) {
                         $this->estmated_output[$row][$value] = $estimate;
                     }
+
                     return;
                 }
             }
         }
         $this->estmated_output[] = array(
             $key => $point,
-            $value => $estimate
+            $value => $estimate,
         );
     }
 
     /**
      * Returns the estmiate of the value of the $value field at $point of the $key field.
      */
-    function estimate($key, $point, $value) {
+    function estimate($key, $point, $value)
+    {
         $high = $this->get_high($this->sorted_input, $key, $point);
         $low = $this->get_low($this->sorted_input, $key, $point);
 
@@ -176,7 +194,7 @@ class estimate {
 
             $average = $this->overall_average($key, $value);
 
-            $estimate = $low[$value] - ( ($low[$key] - $point) * $average);
+            $estimate = $low[$value] - (($low[$key] - $point) * $average);
         } else {
 
             $average = $this->average($key, $value, $point);
@@ -185,42 +203,47 @@ class estimate {
         }
 
         $this->insert_est_array($key, $point, $value, $estimate);
+
         return $estimate;
     }
 
-    function series_estimate($key, $point, $value, $series) {
+    function series_estimate($key, $point, $value, $series)
+    {
         $point = $point + $series;
         for ($i = 3; $i > 0; $i--) {
             $values[] = $this->estimate($key, $point, $value);
             $point = $point - $series;
         }
         $average = array_sum($values) / count($values);
+
         return $average;
     }
 
     /**
      * Returns the differance or increase of $value field between $point of $key and ($point - $diff) of $key.
      */
-    function differance_estimate($key, $point, $value, $diff) {
+    function differance_estimate($key, $point, $value, $diff)
+    {
         $hightvalues = $this->estimate($key, $point, $value);
         $point = $point - $diff;
         $lowvalues = $this->estimate($key, $point, $value);
         $usage = $hightvalues - $lowvalues;
+
         return $usage;
     }
 
     /**
      * Returns the average over the last 3 series of differance_estimate.
      */
-    function series_diff_estimate($key, $point, $value, $series, $diff) {
+    function series_diff_estimate($key, $point, $value, $series, $diff)
+    {
         for ($i = 3; $i > 0; $i--) {
             $values[] = $this->differance_estimate($key, $point, $value, $diff);
             $point = $point - $series;
         }
         $average = array_sum($values) / count($values);
+
         return $average;
     }
 
 }
-
-?>
